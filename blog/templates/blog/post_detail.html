@@ -1,0 +1,171 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }} - Multi-Author Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <article class="card shadow-sm mb-4">
+            <div class="card-body p-4 p-md-5">
+
+                {% if post.status == 'draft' %}
+                    <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                        <div>
+                            <strong>Draft Mode:</strong> This post is a draft and is only visible to you (the author) or site administrators.
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Post Category & Meta Header -->
+                <div class="mb-3">
+                    <a href="{% url 'category_posts' post.category.slug %}" class="badge bg-primary text-decoration-none fs-6 mb-2">
+                        <i class="bi bi-folder me-1"></i>{{ post.category.name }}
+                    </a>
+                </div>
+
+                <h1 class="fw-bold display-5 mb-3">{{ post.title }}</h1>
+
+                <div class="d-flex flex-wrap align-items-center justify-content-between text-muted border-top border-bottom py-3 mb-4">
+                    <div class="d-flex align-items-center me-3 mb-2 mb-md-0">
+                        <div class="avatar-placeholder me-2">
+                            {{ post.author.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <a href="{% url 'author_profile' post.author.username %}" class="text-dark fw-bold text-decoration-none">
+                                {{ post.author.username }}
+                            </a>
+                            <div class="small text-muted">Author</div>
+                        </div>
+                    </div>
+
+                    <div class="small">
+                        <span class="me-3"><i class="bi bi-calendar-event me-1"></i>Published: {{ post.created_at|date:"F d, Y" }}</span>
+                        {% if post.updated_at != post.created_at %}
+                            <span class="me-3"><i class="bi bi-arrow-repeat me-1"></i>Updated: {{ post.updated_at|date:"F d, Y" }}</span>
+                        {% endif %}
+                        <span class="me-3"><i class="bi bi-eye me-1"></i>{{ post.view_count }} views</span>
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                {% if post.featured_image %}
+                    <div class="mb-4 text-center">
+                        <img src="{{ post.featured_image.url }}" class="post-detail-img shadow-sm" alt="{{ post.title }}">
+                    </div>
+                {% endif %}
+
+                <!-- Post Content -->
+                <div class="post-content fs-5 lh-lg mb-5">
+                    {{ post.content|linebreaks }}
+                </div>
+
+                <!-- Tags Section -->
+                <div class="mb-4">
+                    <strong class="me-2"><i class="bi bi-tags-fill text-primary"></i>Tags:</strong>
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'tag_posts' tag.slug %}" class="badge badge-tag fs-6">
+                            #{{ tag.name }}
+                        </a>
+                    {% empty %}
+                        <span class="text-muted">No tags assigned.</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Like Toggle & Actions Bar -->
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded mb-4">
+                    <div class="d-flex align-items-center">
+                        {% if user.is_authenticated %}
+                            <form method="POST" action="{% url 'like_toggle' post.slug %}" class="d-inline">
+                                {% csrf_token %}
+                                {% if user_has_liked %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-heart-fill me-1"></i>Unlike ({{ post.like_count }})
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-heart me-1"></i>Like ({{ post.like_count }})
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-heart me-1"></i>Log in to like ({{ post.like_count }})
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if user == post.author or user.is_superuser %}
+                        <div>
+                            <a href="{% url 'post_edit' post.slug %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil me-1"></i>Edit Post
+                            </a>
+                            <a href="{% url 'post_delete' post.slug %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i>Delete Post
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <section class="card shadow-sm mb-5">
+            <div class="card-body p-4 p-md-5">
+                <h3 class="fw-bold mb-4">
+                    <i class="bi bi-chat-left-text-fill me-2 text-primary"></i>Comments ({{ comments.count }})
+                </h3>
+
+                <!-- Comment Form -->
+                {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'comment_create' post.slug %}" class="mb-5">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_content" class="form-label fw-bold">Leave a Comment</label>
+                            {{ comment_form.content }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-1"></i>Post Comment
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-secondary d-flex align-items-center mb-5" role="alert">
+                        <i class="bi bi-lock-fill me-2 fs-5"></i>
+                        <div>
+                            Want to leave a comment? <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">Log in here</a>.
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Comment List -->
+                {% if comments %}
+                    <div class="comment-list">
+                        {% for comment in comments %}
+                            <div class="comment-box shadow-sm mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-circle fs-5 me-2 text-secondary"></i>
+                                        <strong class="me-2">{{ comment.user.username }}</strong>
+                                        {% if comment.user == post.author %}
+                                            <span class="badge bg-primary me-2">Author</span>
+                                        {% endif %}
+                                        <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                                    </div>
+                                    {% if user == comment.user or user == post.author or user.is_superuser %}
+                                        <a href="{% url 'comment_delete' comment.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Comment">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-0 text-dark">{{ comment.content|linebreaksbr }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted fst-italic">No comments yet. Be the first to share your thoughts!</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

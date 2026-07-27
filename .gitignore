@@ -1,21 +1,29 @@
+# Environment variables
+.env
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python bytecode & cache
 __pycache__/
 *.py[cod]
+*$py.class
 
-venv/
-.venv/
-env/
-
-.env
-.env.*
-
+# Database
 db.sqlite3
 db.sqlite3-journal
 
-staticfiles/
+# Media user uploads
 media/
 
+# IDE / Editor files
 .vscode/
 .idea/
+*.swp
+*.swo
 
+# OS files
 .DS_Store
 Thumbs.db

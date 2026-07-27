@@ -1,0 +1,110 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Author Profile: {{ author_user.username }} - Multi-Author Blog{% endblock %}
+
+{% block content %}
+<!-- Author Profile Header -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4 p-md-5">
+        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start text-center text-md-start">
+            <div class="avatar-placeholder me-md-4 mb-3 mb-md-0" style="width: 80px; height: 80px; font-size: 2.2rem;">
+                {{ author_user.username|slice:":1"|upper }}
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-2">
+                    <h2 class="fw-bold mb-0">{{ author_user.username }}</h2>
+                    <span class="badge bg-primary fs-6">
+                        {% if profile and profile.is_author %}Approved Author{% else %}Reader{% endif %}
+                    </span>
+                </div>
+
+                {% if author_user.first_name or author_user.last_name %}
+                    <p class="text-muted fw-semibold mb-2">
+                        <i class="bi bi-person me-1"></i>{{ author_user.get_full_name }}
+                    </p>
+                {% endif %}
+
+                {% if profile and profile.bio %}
+                    <p class="lead fs-6 text-secondary mb-3">{{ profile.bio }}</p>
+                {% else %}
+                    <p class="text-muted fst-italic mb-3">Writer and contributor on MultiAuthor Blog.</p>
+                {% endif %}
+
+                <div class="d-flex gap-3 justify-content-center justify-content-md-start">
+                    <span class="badge bg-light text-dark border px-3 py-2 fs-6">
+                        <i class="bi bi-journal-check me-1 text-success"></i>{{ total_published }} Published Article{% if total_published != 1 %}s{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Published Articles Section -->
+<h3 class="fw-bold mb-3"><i class="bi bi-newspaper me-2 text-primary"></i>Published Articles by {{ author_user.username }}</h3>
+
+{% if page_obj %}
+    <div class="row g-4 mb-4">
+        {% for post in page_obj %}
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    {% if post.featured_image %}
+                        <img src="{{ post.featured_image.url }}" class="post-card-img" alt="{{ post.title }}">
+                    {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center post-card-img">
+                            <i class="bi bi-image fs-1"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <a href="{% url 'category_posts' post.category.slug %}" class="badge bg-primary text-decoration-none">
+                                {{ post.category.name }}
+                            </a>
+                            <small class="text-muted ms-2">{{ post.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <h4 class="card-title fw-bold">
+                            <a href="{% url 'post_detail' post.slug %}" class="text-dark text-decoration-none">
+                                {{ post.title }}
+                            </a>
+                        </h4>
+                        <p class="card-text text-muted flex-grow-1">
+                            {{ post.content|truncatewords:25 }}
+                        </p>
+                        <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-2">
+                            <span class="small text-muted"><i class="bi bi-eye me-1"></i>{{ post.view_count }} views</span>
+                            <a href="{% url 'post_detail' post.slug %}" class="btn btn-sm btn-outline-primary">
+                                Read Article <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <nav aria-label="Author articles pagination" class="my-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo; Previous</span></li>
+                {% endif %}
+
+                <li class="page-item disabled"><span class="page-link text-dark fw-semibold">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info shadow-sm" role="alert">
+        <i class="bi bi-info-circle me-2"></i>This author has not published any articles yet.
+    </div>
+{% endif %}
+{% endblock %}

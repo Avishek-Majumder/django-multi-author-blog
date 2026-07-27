@@ -1,0 +1,85 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Tag: #{{ tag.name }} - Multi-Author Blog{% endblock %}
+
+{% block content %}
+<div class="mb-4 p-4 bg-light rounded shadow-sm border-start border-4 border-secondary">
+    <h2 class="fw-bold mb-1">
+        <i class="bi bi-tag-fill text-secondary me-2"></i>Tag: #{{ tag.name }}
+    </h2>
+    <p class="text-muted mb-0">Showing all published articles tagged with #{{ tag.name }}.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-12">
+        {% if page_obj %}
+            {% for post in page_obj %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-3">
+                            {% if post.featured_image %}
+                                <img src="{{ post.featured_image.url }}" class="img-fluid rounded-start h-100 object-fit-cover w-100" style="min-height: 160px;" alt="{{ post.title }}">
+                            {% else %}
+                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center h-100 rounded-start" style="min-height: 160px;">
+                                    <i class="bi bi-image fs-2"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <a href="{% url 'category_posts' post.category.slug %}" class="badge bg-primary text-decoration-none">
+                                        {{ post.category.name }}
+                                    </a>
+                                </div>
+                                <h4 class="card-title fw-bold">
+                                    <a href="{% url 'post_detail' post.slug %}" class="text-dark text-decoration-none">
+                                        {{ post.title }}
+                                    </a>
+                                </h4>
+                                <p class="card-text text-muted">
+                                    {{ post.content|truncatewords:30 }}
+                                </p>
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <small class="text-muted">
+                                        By <a href="{% url 'author_profile' post.author.username %}" class="fw-semibold text-dark text-decoration-none">{{ post.author.username }}</a> on {{ post.created_at|date:"M d, Y" }}
+                                    </small>
+                                    <a href="{% url 'post_detail' post.slug %}" class="btn btn-sm btn-outline-primary">
+                                        Read Article <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Tag pagination" class="my-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">&laquo; Previous</span></li>
+                        {% endif %}
+
+                        <li class="page-item disabled"><span class="page-link text-dark fw-semibold">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info shadow-sm" role="alert">
+                <i class="bi bi-info-circle me-2"></i>No published posts found with this tag.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

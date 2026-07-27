@@ -1,0 +1,110 @@
+/* Custom Styling for Multi-Author Blog */
+
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --dark-bg: #212529;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --card-hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #212529;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.post-card-img {
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.post-detail-img {
+    max-height: 450px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem;
+}
+
+.badge-category {
+    background-color: #0d6efd;
+    font-weight: 500;
+}
+
+.badge-tag {
+    background-color: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.badge-tag:hover {
+    background-color: #ced4da;
+    color: #212529;
+}
+
+.avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.2rem;
+}
+
+.comment-box {
+    border-left: 3px solid #0d6efd;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-check-input-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding-left: 0;
+}
+
+.form-check-input-list label {
+    background-color: #f1f3f5;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.form-check-input-list input[type="checkbox"]:checked + label,
+.form-check-input-list label:has(input[type="checkbox"]:checked) {
+    background-color: #0d6efd;
+    color: white;
+}
+
+footer {
+    margin-top: auto;
+}
