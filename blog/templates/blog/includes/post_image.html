@@ -1,0 +1,8 @@
+{% load static %}
+<img 
+    src="{{ post.display_image_url }}" 
+    alt="{{ post.title }}" 
+    loading="lazy" 
+    class="{{ img_class|default:'post-card-img' }}" 
+    onerror="this.onerror=null;this.src='{% static 'images/default-post.jpg' %}';"
+>

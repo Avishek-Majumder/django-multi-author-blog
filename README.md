@@ -6,6 +6,28 @@ This project implements user role management (Readers vs. Authors), blog post li
 
 ---
 
+## 📸 Sample Post Images
+
+Seeded blog posts are configured with high-quality, free public stock images sourced from Unsplash under the Unsplash free-use license.
+
+### Image Display Priority Logic
+When rendering a blog post image, the application follows a strict 3-tier priority sequence:
+1. **Author-Uploaded Image (`featured_image`):** Local file uploaded by an author takes top priority.
+2. **External Sample Image URL (`external_image_url`):** Direct HTTPS stock image CDN URL used when no local file is uploaded.
+3. **Local Default Fallback (`/static/images/default-post.jpg`):** Clean neutral graphic displayed if neither uploaded file nor external URL exists, or if browser loading encounters a network error (`onerror` fallback).
+
+> **Note:** External stock images require an active internet connection to load. Authors can upload local images at any time to override external images.
+
+### Stock Photo Credits
+We gratefully acknowledge the photographers on Unsplash for providing royalty-free images:
+- **Domenico Loia** ([Unsplash Photo Page](https://unsplash.com/photos/hGV2TfOh0ns)) – *Getting Started with Django 5 and Python*
+- **Andrew Neel** ([Unsplash Photo Page](https://unsplash.com/photos/cckf433-14g)) – *10 Essential Productivity Hacks for Developers*
+- **Florian Olivo** ([Unsplash Photo Page](https://unsplash.com/photos/4hb8-eymZ-E)) – *Draft: Advanced Query Optimization in Django ORM*
+- **Kalen Emsley** ([Unsplash Photo Page](https://unsplash.com/photos/Bkci_8qcdvQ)) – *Exploring the Serene Mountains of Alpine Valleys*
+- **Clement Helvez** ([Unsplash Photo Page](https://unsplash.com/photos/95YRwf6CNw8)) – *Building REST APIs with Python and Django*
+
+---
+
 ## 🌟 Key Features
 
 ### 1. User Authentication & Role Management
@@ -20,7 +42,7 @@ This project implements user role management (Readers vs. Authors), blog post li
 ### 3. Blog Post Lifecycle & Draft Privacy
 - Posts support status: **Draft** or **Published**.
 - Auto-generated unique slugs with duplicate title collision protection.
-- Required featured image upload handled cleanly via Pillow.
+- Required/optional featured image upload handled cleanly via Pillow with display fallback logic.
 - **Strict Privacy:** Draft posts are strictly hidden from the homepage, category pages, tag pages, search results, and public author profiles. Drafts are accessible only to their author in their Author Dashboard or to superusers.
 
 ### 4. Author Dashboard & Analytics
@@ -54,9 +76,11 @@ django-multi-author-blog/
 ├── blog/                      # Main Django Application
 │   ├── management/
 │   │   └── commands/
-│   │       └── seed_blog.py   # Seed script for sample users, categories, posts, comments
+│   │       └── seed_blog.py   # Seed script for sample users, categories, stock photos
 │   ├── migrations/            # Database migration scripts
-│   ├── templates/blog/        # HTML Templates
+│   ├── templates/blog/        # HTML Templates & Partial Include
+│   │   ├── includes/
+│   │   │   └── post_image.html # Reusable post image partial with onerror fallback
 │   │   ├── base.html
 │   │   ├── home.html
 │   │   ├── post_detail.html
@@ -70,13 +94,13 @@ django-multi-author-blog/
 │   │   ├── author_profile.html
 │   │   ├── register.html
 │   │   └── login.html
-│   ├── admin.py               # Django Admin configuration & list displays
+│   ├── admin.py               # Django Admin configuration & image preview
 │   ├── apps.py                # App config & signals loader
 │   ├── decorators.py          # Custom @author_required view decorator
 │   ├── forms.py               # Registration, Post, and Comment forms
 │   ├── models.py              # AuthorProfile, Category, Tag, Post, Comment, Like models
 │   ├── signals.py             # Auto-create AuthorProfile on User creation
-│   ├── tests.py               # Automated unit test suite
+│   ├── tests.py               # Automated unit test suite (14 tests)
 │   ├── urls.py                # Application URL routing
 │   └── views.py               # Application logic & controller views
 │
@@ -86,10 +110,12 @@ django-multi-author-blog/
 │   ├── wsgi.py
 │   └── asgi.py
 │
-├── media/                     # Uploaded media files (featured images)
+├── media/                     # Uploaded media files
 ├── static/
-│   └── css/
-│       └── style.css          # Custom styling additions
+│   ├── css/
+│   │   └── style.css          # Custom responsive image & card styling
+│   └── images/
+│       └── default-post.jpg   # Default fallback image
 │
 ├── .env                       # Environment secrets (ignored by Git)
 ├── .env.example               # Template environment configuration file
@@ -133,12 +159,6 @@ Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
-Ensure your `.env` contains:
-```env
-SECRET_KEY=django-insecure-your-custom-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=127.0.0.1,localhost
-```
 
 ### 5. Apply Migrations
 ```bash
@@ -150,10 +170,8 @@ python manage.py migrate
 ```bash
 python manage.py createsuperuser
 ```
-Follow the prompts to enter a username, email, and password.
 
-### 7. Seed Sample Data (Optional but Recommended)
-Run the built-in management command to automatically populate sample users, categories, tags, published posts, drafts, comments, and likes:
+### 7. Seed Sample Data with Real Stock Photos
 ```bash
 python manage.py seed_blog
 ```
@@ -181,15 +199,12 @@ To promote a regular Reader to an Author:
 2. Go to **Blog > Author profiles**.
 3. Locate the user you wish to promote.
 4. Check the **Is author** box and click **Save**.
-5. The user will immediately gain access to the **Author Dashboard** (`/dashboard/`) and post creation tools.
 
 ---
 
 ## 🧪 Running Automated Tests
 
-The repository includes comprehensive automated unit tests covering user role authorization, post creation/editing restrictions, draft privacy, comment moderation, and duplicate like prevention.
-
-Run the test suite with:
+Run the test suite (14 unit tests):
 ```bash
 python manage.py test blog
 ```
@@ -198,33 +213,17 @@ python manage.py test blog
 
 ## 🛡️ Security & Git Hygiene
 
-The following items are strictly excluded from version control via `.gitignore`:
-- Real `.env` files with API keys or secret tokens
-- Virtual environment directory (`venv/`)
-- Local SQLite database (`db.sqlite3`)
-- User-uploaded media files (`media/`)
-- Python bytecode (`__pycache__/`, `*.pyc`)
+Excluded from version control via `.gitignore`: `.env`, `venv/`, `db.sqlite3`, `media/`, `__pycache__/`.
 
 ---
 
 ## 📤 Submission & GitHub Upload Commands
 
-To initialize and push your project to GitHub:
-
 ```bash
 git init
 git add .
-git commit -m "Complete Django multi-author blogging platform"
+git commit -m "Complete Django multi-author blogging platform with stock images"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/django-multi-author-blog.git
 git push -u origin main
 ```
-
----
-
-## 🌐 Optional Deployment Notes
-
-### Deploying on Render / PythonAnywhere:
-1. Set `DEBUG=False` in environment variables on your deployment platform.
-2. Set a secure `SECRET_KEY` and set `ALLOWED_HOSTS` to your live domain (e.g. `your-app.onrender.com`).
-3. Set up static file collection using `python manage.py collectstatic` or `whitenoise`.

@@ -70,7 +70,22 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     content = models.TextField()
-    featured_image = models.ImageField(upload_to='posts/')
+    featured_image = models.ImageField(upload_to='posts/', blank=True, null=True)
+    external_image_url = models.URLField(
+        max_length=1000,
+        blank=True,
+        help_text="Optional external image URL used when no featured image is uploaded."
+    )
+    image_credit_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional photographer/creator credit name."
+    )
+    image_credit_url = models.URLField(
+        max_length=1000,
+        blank=True,
+        help_text="Optional link to original photo source."
+    )
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='posts')
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
@@ -92,6 +107,17 @@ class Post(models.Model):
                 count += 1
             self.slug = slug
         super().save(*args, **kwargs)
+
+    @property
+    def display_image_url(self):
+        if self.featured_image:
+            try:
+                return self.featured_image.url
+            except ValueError:
+                pass
+        if self.external_image_url:
+            return self.external_image_url
+        return "/static/images/default-post.jpg"
 
     @property
     def like_count(self):

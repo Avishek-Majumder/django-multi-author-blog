@@ -17,13 +17,7 @@
                 <div class="card mb-4 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-3">
-                            {% if post.featured_image %}
-                                <img src="{{ post.featured_image.url }}" class="img-fluid rounded-start h-100 object-fit-cover w-100" style="min-height: 160px;" alt="{{ post.title }}">
-                            {% else %}
-                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center h-100 rounded-start" style="min-height: 160px;">
-                                    <i class="bi bi-image fs-2"></i>
-                                </div>
-                            {% endif %}
+                            {% include 'blog/includes/post_image.html' with img_class='post-list-img' %}
                         </div>
                         <div class="col-md-9">
                             <div class="card-body">

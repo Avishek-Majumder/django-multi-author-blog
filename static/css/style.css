@@ -1,4 +1,4 @@
-/* Custom Styling for Multi-Author Blog */
+/* Custom Styling & Responsive Enhancements for Multi-Author Blog */
 
 :root {
     --primary-color: #0d6efd;
@@ -8,14 +8,33 @@
     --card-hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Global Viewport & Reset Protection */
+html,
 body {
+    max-width: 100%;
+    overflow-x: hidden;
     background-color: #f8f9fa;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #212529;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Text Wrapping Protection */
+.post-title,
+.post-content,
+.comment-content,
+.card-title,
+.page-heading {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .card {
@@ -30,18 +49,52 @@ body {
     box-shadow: var(--card-hover-shadow);
 }
 
+/* Responsive Image Rules */
 .post-card-img {
-    height: 200px;
+    width: 100%;
+    height: 240px;
     object-fit: cover;
+    object-position: center;
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
 }
 
-.post-detail-img {
-    max-height: 450px;
+.post-list-img {
     width: 100%;
+    height: 100%;
+    min-height: 240px;
     object-fit: cover;
+    object-position: center;
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+}
+
+@media (max-width: 767.98px) {
+    .post-list-img {
+        width: 100%;
+        height: 220px;
+        min-height: 220px;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0.75rem;
+    }
+}
+
+.post-detail-img {
+    width: 100%;
+    max-height: 550px;
+    object-fit: cover;
+    object-position: center;
     border-radius: 0.75rem;
+}
+
+/* Badges & Flex Containers */
+.tag-container,
+.category-container,
+.post-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .badge-category {
@@ -73,6 +126,7 @@ body {
     justify-content: center;
     border-radius: 50%;
     font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
 .comment-box {
@@ -103,6 +157,25 @@ body {
 .form-check-input-list label:has(input[type="checkbox"]:checked) {
     background-color: #0d6efd;
     color: white;
+}
+
+/* Typography Scalers for Small Viewports */
+@media (max-width: 575.98px) {
+    .display-5 {
+        font-size: 1.75rem;
+    }
+    
+    .post-title {
+        font-size: 1.25rem;
+    }
+    
+    .page-heading {
+        font-size: 1.4rem;
+    }
+    
+    .hero-banner {
+        padding: 1.5rem !important;
+    }
 }
 
 footer {

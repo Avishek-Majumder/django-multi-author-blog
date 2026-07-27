@@ -17,18 +17,18 @@
 
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="{% url 'home' %}">
-                <i class="bi bi-journal-text me-2 text-primary"></i>MultiAuthor<span class="text-primary">Blog</span>
+        <div class="container-fluid container-lg px-3">
+            <a class="navbar-brand fw-bold fs-4 text-truncate" style="max-width: 220px;" href="{% url 'home' %}">
+                <i class="bi bi-journal-text me-1 text-primary"></i>MultiAuthor<span class="text-primary">Blog</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarContent">
+            <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarContent">
                 <!-- Search Bar -->
-                <form class="d-flex ms-lg-3 my-2 my-lg-0 flex-grow-1 max-w-md" action="{% url 'search' %}" method="GET">
-                    <div class="input-group input-group-sm">
+                <form class="d-flex my-2 my-lg-0 mx-lg-3 flex-grow-1" style="max-width: 450px;" action="{% url 'search' %}" method="GET">
+                    <div class="input-group input-group-sm w-100">
                         <input class="form-control" type="search" name="q" placeholder="Search posts..." value="{{ request.GET.q|default:'' }}" aria-label="Search">
                         <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
                     </div>
@@ -49,8 +49,8 @@
                                     <i class="bi bi-speedometer2 me-1"></i>Dashboard
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="btn btn-sm btn-outline-primary ms-lg-2 me-lg-2 my-1" href="{% url 'post_create' %}">
+                            <li class="nav-item my-1 my-lg-0">
+                                <a class="btn btn-sm btn-outline-primary ms-lg-2 me-lg-2 w-100 w-lg-auto" href="{% url 'post_create' %}">
                                     <i class="bi bi-pencil-square me-1"></i>New Post
                                 </a>
                             </li>
@@ -64,12 +64,12 @@
                             </li>
                         {% endif %}
 
-                        <li class="nav-item dropdown ms-lg-2">
+                        <li class="nav-item dropdown ms-lg-2 my-1 my-lg-0">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="badge bg-secondary me-1">
                                     {% if user.author_profile.is_author %}Author{% else %}Reader{% endif %}
                                 </span>
-                                {{ user.username }}
+                                <span class="text-truncate" style="max-width: 120px;">{{ user.username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{% url 'author_profile' user.username %}"><i class="bi bi-person me-2"></i>My Public Profile</a></li>
@@ -90,8 +90,8 @@
                                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
                             </a>
                         </li>
-                        <li class="nav-item ms-lg-1">
-                            <a class="btn btn-sm btn-primary" href="{% url 'register' %}">
+                        <li class="nav-item ms-lg-1 my-1 my-lg-0">
+                            <a class="btn btn-sm btn-primary w-100 w-lg-auto" href="{% url 'register' %}">
                                 <i class="bi bi-person-plus me-1"></i>Register
                             </a>
                         </li>
@@ -102,7 +102,7 @@
     </nav>
 
     <!-- Alert Messages -->
-    <div class="container mt-3">
+    <div class="container-fluid container-lg px-3 mt-3">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
@@ -121,14 +121,14 @@
     </div>
 
     <!-- Main Content Block -->
-    <main class="container my-4 flex-grow-1">
+    <main class="container-fluid container-lg px-3 my-4 flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-auto">
-        <div class="container text-center">
-            <p class="mb-1">&copy; 2026 MultiAuthorBlog. All rights reserved.</p>
+        <div class="container text-center px-3">
+            <p class="mb-1 small">&copy; 2026 MultiAuthorBlog. All rights reserved.</p>
             <small class="text-muted">Built with Python, Django, and Bootstrap 5.</small>
         </div>
     </footer>

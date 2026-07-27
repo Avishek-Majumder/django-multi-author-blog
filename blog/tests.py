@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from blog.models import AuthorProfile, Category, Tag, Post, Comment, Like
 
 
@@ -33,14 +34,17 @@ class BlogPlatformTestCase(TestCase):
             content_type='image/gif'
         )
 
-        # Published post by author1
+        # Published post by author1 with uploaded image & external image URL
         self.published_post = Post.objects.create(
             title='Published Post Title',
             content='This is published content for tech readers.',
             author=self.author1,
             category=self.category,
             status=Post.PUBLISHED,
-            featured_image=self.test_image
+            featured_image=self.test_image,
+            external_image_url='https://example.com/external-stock.jpg',
+            image_credit_name='Sample Photographer',
+            image_credit_url='https://example.com/photo-credit'
         )
         self.published_post.tags.add(self.tag)
 
@@ -53,6 +57,61 @@ class BlogPlatformTestCase(TestCase):
             status=Post.DRAFT,
             featured_image=self.test_image
         )
+
+    def test_image_display_priority_uploaded_over_external(self):
+        # Post has both uploaded featured_image and external_image_url
+        post = Post.objects.create(
+            title='Priority Test Post',
+            content='Testing priority',
+            author=self.author1,
+            category=self.category,
+            status=Post.PUBLISHED,
+            featured_image=self.test_image,
+            external_image_url='https://images.unsplash.com/sample.jpg'
+        )
+        # Uploaded image takes top priority
+        self.assertEqual(post.display_image_url, post.featured_image.url)
+
+    def test_image_display_external_url_when_no_uploaded_image(self):
+        post = Post.objects.create(
+            title='External URL Post',
+            content='Testing external URL',
+            author=self.author1,
+            category=self.category,
+            status=Post.PUBLISHED,
+            external_image_url='https://images.unsplash.com/sample-stock.jpg'
+        )
+        self.assertEqual(post.display_image_url, 'https://images.unsplash.com/sample-stock.jpg')
+
+    def test_image_display_default_fallback_when_neither_present(self):
+        post = Post.objects.create(
+            title='No Image Post',
+            content='Testing fallback',
+            author=self.author1,
+            category=self.category,
+            status=Post.PUBLISHED
+        )
+        self.assertEqual(post.display_image_url, '/static/images/default-post.jpg')
+
+    def test_homepage_includes_external_image_url_for_seeded_post(self):
+        post = Post.objects.create(
+            title='Stock Image Post',
+            content='Content here',
+            author=self.author1,
+            category=self.category,
+            status=Post.PUBLISHED,
+            external_image_url='https://images.unsplash.com/sample-stock-photo.jpg'
+        )
+        response = self.client.get(reverse('home'))
+        self.assertContains(response, 'https://images.unsplash.com/sample-stock-photo.jpg')
+
+    def test_seed_command_idempotency(self):
+        # Running seed command twice should not crash or duplicate users
+        call_command('seed_blog')
+        count_first = Post.objects.count()
+        call_command('seed_blog')
+        count_second = Post.objects.count()
+        self.assertEqual(count_first, count_second)
 
     def test_reader_cannot_create_post(self):
         self.client.login(username='reader_test', password='password123')
